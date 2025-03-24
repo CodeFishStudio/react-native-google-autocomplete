@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   GoogleService,
   type GoogleLocationResult,
+  type Query,
   type QueryTypes,
 } from './services/google.service';
 import { useDebounce } from 'use-debounce';
@@ -45,6 +46,11 @@ interface Options {
    * See https://developers.google.com/places/web-service/autocomplete#place_types = default: address
    */
   queryTypes?: QueryTypes;
+
+  /**
+   * See https://developers.google.com/maps/documentation/places/web-service/autocomplete#locationrestriction
+   */
+  locationRestriction?: Query['locationRestriction'];
 
   /**
    * The distance (in meters) within which to return place results.
@@ -109,6 +115,7 @@ export const useGoogleAutocomplete = (apiKey: string, opts: Options = {}) => {
           lng: opts.lng,
           radius: opts.radius,
           components: opts.components,
+          locationRestriction: opts.locationRestriction,
         },
         opts.proxyUrl
       );

@@ -2,6 +2,11 @@ import queryString from 'query-string';
 
 const BASE_URL = 'https://maps.googleapis.com/maps/api/place';
 
+export type LatLng = {
+  lat: number;
+  lng: number;
+};
+
 export type QueryTypes =
   | 'address'
   | 'geocode'
@@ -19,6 +24,17 @@ export interface Query {
   lat?: number;
   lng?: number;
   strictBounds?: boolean;
+  locationRestriction?:
+    | {
+        type: 'circle';
+        radius: number;
+        center: LatLng;
+      }
+    | {
+        type: 'rectangle';
+        southWest: LatLng;
+        northEast: LatLng;
+      };
 }
 
 export interface GoogleLocationDetailResult {
@@ -35,15 +51,9 @@ export interface GoogleLocationDetailResult {
   vicinity: string;
   types: string[];
   geometry: {
-    location: {
-      lat: number;
-      lng: number;
-    };
+    location: LatLng;
     viewport: {
-      [type: string]: {
-        lat: number;
-        lng: number;
-      };
+      [type: string]: LatLng;
     };
   };
   address_components: Array<{
@@ -84,10 +94,11 @@ interface NormalizeQuery {
   radius?: string;
   location?: string;
   strictBounds?: boolean;
+  locationrestriction?: string;
 }
 
 const normalizeQuery = (query: Query): NormalizeQuery => {
-  const { lat, lng, ...rest } = query;
+  const { lat, lng, locationRestriction, ...rest } = query;
 
   // The latitude/longitude around which to retrieve place information. This must be specified as latitude,longitude.
   let location;
@@ -101,9 +112,29 @@ const normalizeQuery = (query: Query): NormalizeQuery => {
     location = `${lat},${lng}`;
   }
 
+  // Handle location restrictions
+  let locationrestriction;
+
+  if (locationRestriction) {
+    switch (locationRestriction.type) {
+      case 'circle': {
+        const { center, radius } = locationRestriction;
+        locationrestriction = `circle:${radius}@${center.lat},${center.lng}`;
+        break;
+      }
+      case 'rectangle':
+        const { southWest, northEast } = locationRestriction;
+        locationrestriction = `rectangle:${southWest.lat},${southWest.lng}|${northEast.lat},${northEast.lng}`;
+        break;
+      default:
+        break;
+    }
+  }
+
   return {
     ...rest,
     location,
+    locationrestriction,
   };
 };
 
