@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   GoogleService,
   type GoogleLocationResult,
+  type QueryTypes,
 } from './services/google.service';
 import { useDebounce } from 'use-debounce';
 import { useIsMounted } from './useIsMounted';
@@ -43,12 +44,7 @@ interface Options {
   /**
    * See https://developers.google.com/places/web-service/autocomplete#place_types = default: address
    */
-  queryTypes?:
-    | 'address'
-    | 'geocode'
-    | '(cities)'
-    | 'establishment'
-    | 'geocode|establishment';
+  queryTypes?: QueryTypes;
 
   /**
    * The distance (in meters) within which to return place results.

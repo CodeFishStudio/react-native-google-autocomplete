@@ -2,15 +2,18 @@ import queryString from 'query-string';
 
 const BASE_URL = 'https://maps.googleapis.com/maps/api/place';
 
+export type QueryTypes =
+  | 'address'
+  | 'geocode'
+  | '(cities)'
+  | '(regions)'
+  | 'establishment'
+  | 'geocode|establishment';
+
 export interface Query {
   language: string;
   key: string;
-  types:
-    | 'address'
-    | 'geocode'
-    | '(cities)'
-    | 'establishment'
-    | 'geocode|establishment';
+  types: QueryTypes;
   components?: string;
   radius?: string;
   lat?: number;
@@ -76,12 +79,7 @@ export interface GoogleLocationResult {
 interface NormalizeQuery {
   language: string;
   key: string;
-  types:
-    | 'address'
-    | 'geocode'
-    | '(cities)'
-    | 'establishment'
-    | 'geocode|establishment';
+  types: QueryTypes;
   components?: string;
   radius?: string;
   location?: string;
