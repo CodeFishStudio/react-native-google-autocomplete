@@ -78,6 +78,11 @@ interface Options {
    * Proxy url if you want to use the web, this is needed cause of CORS issue
    */
   proxyUrl?: string;
+
+  /**
+   * Optional headers to be sent with the request
+   */
+  headers?: HeadersInit;
 }
 
 export const useGoogleAutocomplete = (apiKey: string, opts: Options = {}) => {
@@ -117,7 +122,8 @@ export const useGoogleAutocomplete = (apiKey: string, opts: Options = {}) => {
           components: opts.components,
           locationRestriction: opts.locationRestriction,
         },
-        opts.proxyUrl
+        opts.proxyUrl,
+        opts.headers
       );
 
       setLocationResults(results.predictions);
@@ -131,12 +137,16 @@ export const useGoogleAutocomplete = (apiKey: string, opts: Options = {}) => {
   };
 
   const searchDetails = async (placeId: string) => {
-    return GoogleService.searchDetails(placeId, {
-      key: apiKey,
-      language,
-      types: queryTypes,
-      components: opts.components,
-    });
+    return GoogleService.searchDetails(
+      placeId,
+      {
+        key: apiKey,
+        language,
+        types: queryTypes,
+        components: opts.components,
+      },
+      opts.headers
+    );
   };
 
   const clearSearch = () => {
